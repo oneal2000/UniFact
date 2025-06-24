@@ -410,37 +410,35 @@ In this example, `my_new_method` (AUROC: 0.8156) outperforms the baseline `lnpp`
 
 ## 📋 Dataset Setup
 
-AutoEval-HD-FV supports six major QA datasets:
+AutoEval-HD-FV supports five major QA datasets:
 
-<details>
-<summary>Click to expand dataset download instructions</summary>
+### 2WikiMultihopQA
 
-#### TriviaQA
+1. Download the dataset from the [official repository](https://www.dropbox.com/s/ms2m13252h6xubs/data_ids_april7.zip?e=1)
+2. Extract and move the folder to `data/2wikimultihopqa`
+
+### HotpotQA
+
+```bash
+mkdir -p data/hotpotqa
+wget -P data/hotpotqa/ http://curtis.ml.cmu.edu/datasets/hotpot/hotpot_dev_distractor_v1.json
+```
+
+### PopQA
+
+```bash
+mkdir -p data/popqa
+wget -P data/popqa https://raw.githubusercontent.com/AlexTMallen/adaptive-retrieval/main/data/popQA.tsv
+```
+
+### TriviaQA
+
 ```bash
 mkdir -p data/triviaqa
 wget -P data/triviaqa https://nlp.cs.washington.edu/triviaqa/data/triviaqa-unfiltered.tar.gz
 tar -xvzf data/triviaqa/triviaqa-unfiltered.tar.gz -C data/triviaqa
 ```
 
-#### PopQA
-```bash
-mkdir -p data/popqa
-wget -P data/popqa https://raw.githubusercontent.com/AlexTMallen/adaptive-retrieval/main/data/popQA.tsv
-```
+### Natural Questions (NQ)
 
-#### HotpotQA
-```bash
-mkdir -p data/hotpotqa
-wget -P data/hotpotqa/ http://curtis.ml.cmu.edu/datasets/hotpot/hotpot_dev_distractor_v1.json
-```
-
-#### 2WikiMultihopQA
-Download from [official repository](https://www.dropbox.com/s/ms2m13252h6xubs/data_ids_april7.zip?e=1) and extract to `data/2wikimultihopqa`
-
-#### Natural Questions (NQ)
-Download `NQ-open.efficientqa.dev.1.1.jsonl` from [Google Research](https://github.com/google-research-datasets/natural-questions) to `data/nq/`
-
-#### ComplexWebQ
-Follow standard dataset preparation procedures for ComplexWebQ
-
-</details>
+Download the `NQ-open.efficientqa.dev.1.1.jsonl` file from the [Google Research repository](https://github.com/google-research-datasets/natural-questions) and place it in `data/nq/`.
