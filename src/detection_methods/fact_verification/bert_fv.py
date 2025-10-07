@@ -33,10 +33,17 @@ class BertFVModel(nn.Module):
 
 class BertFVDataset(Dataset):
     """Dataset class for BERT fact verification."""
-    def __init__(self, data: List[Dict[str, Any]], tokenizer: AutoTokenizer, max_length: int):
+    def __init__(self,
+                 data: List[Dict[str, Any]],
+                 tokenizer: AutoTokenizer,
+                 max_length: int,
+                 retrieval_type: str):
         self.data = data
         self.tokenizer = tokenizer
         self.max_length = max_length
+        if retrieval_type not in {"question_only", "question_answer"}:
+            raise ValueError(f"Unsupported retrieval_type '{retrieval_type}' for BertFVDataset")
+        self.retrieval_type = retrieval_type
 
     def __len__(self):
         return len(self.data)
@@ -44,12 +51,17 @@ class BertFVDataset(Dataset):
     def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
         item = self.data[idx]
         
-        question = str(item.get('question', ''))
-        answer = str(item.get('generated_answer', ''))
-        external_passage = str(item.get('external_passage', ''))
+        question = str(item.get('question', '') or '')
+        answer = str(item.get('generated_answer', '') or '')
 
-        text_segment1 = external_passage
-        text_segment2 = f"{question}{self.tokenizer.sep_token}{answer}"
+        sep_token = self.tokenizer.sep_token or "[SEP]"
+        if self.retrieval_type == "question_only":
+            passage_text = item.get('question_only_passages', item.get('external_passage', ''))
+        else:
+            passage_text = item.get('qa_combined_passages', item.get('external_passage', ''))
+        text_segment2 = f"{question} {sep_token} {answer}".strip()
+
+        text_segment1 = str(passage_text or '')
 
         encoding = self.tokenizer.encode_plus(
             text_segment1,
@@ -72,7 +84,11 @@ class BertFVDataset(Dataset):
 
 class BertFactVerifier:
     """Main fact verification class using BERT."""
-    def __init__(self, model_dir: str, device: str = "auto", max_length: int = 512):
+    def __init__(self,
+                 model_dir: str,
+                 device: str = "auto",
+                 max_length: int = 512,
+                 retrieval_type: Optional[str] = None):
         self.device = torch.device("cuda" if device == "auto" and torch.cuda.is_available() else device)
         self.max_length = max_length
         
@@ -85,15 +101,23 @@ class BertFactVerifier:
             raise FileNotFoundError(f"BERT FV Model state file not found in {model_dir}")
 
         original_bert_base_name = None
+        summary_retrieval_type = None
         training_summary_path = os.path.join(model_dir, "best_training_summary.json")
         if os.path.exists(training_summary_path):
             with open(training_summary_path, 'r') as f:
                 summary = json.load(f)
                 original_bert_base_name = summary.get('args', {}).get('bert_model_name')
+                summary_retrieval_type = summary.get('args', {}).get('retrieval_type')
                 if original_bert_base_name:
                     print(f"Using original BERT base '{original_bert_base_name}' for classifier")
         if not original_bert_base_name:
             raise ValueError(f"Could not determine original BERT base name from {training_summary_path}")
+
+        if retrieval_type is None:
+            retrieval_type = summary_retrieval_type
+        if retrieval_type not in {"question_only", "question_answer"}:
+            raise ValueError(f"Unsupported or missing retrieval_type for BERT FV model at {model_dir}")
+        self.retrieval_type = retrieval_type
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_dir)
         self.model = BertFVModel(model_name_or_path=original_bert_base_name, num_labels=2)
@@ -106,8 +130,9 @@ class BertFactVerifier:
             retrieved_passages = []
             print(f"Warning: Invalid retrieved_passages for BERT FV for Q '{question[:30]}...'. Using empty passages.")
 
-        text_segment1 = " ".join(retrieved_passages)
-        text_segment2 = f"{question}{self.tokenizer.sep_token}{answer}"
+        text_segment1 = " ".join(p for p in retrieved_passages if isinstance(p, str))
+        sep_token = self.tokenizer.sep_token or "[SEP]"
+        text_segment2 = f"{question} {sep_token} {answer}".strip()
 
         encoding = self.tokenizer.encode_plus(
             text_segment1, text_segment2,

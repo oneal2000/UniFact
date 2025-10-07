@@ -61,6 +61,8 @@ def initialize_verifiers(fv_methods: List[FVMethod], args) -> Dict[str, Any]:
     
     for method in fv_methods:
         cache_key = (method.verifier_type, method.model_path)
+        if method.verifier_type == 'bert':
+            cache_key = cache_key + (method.retrieval_type.value,)
         
         # Check if we already have a verifier for this model
         if cache_key in model_cache:
@@ -78,7 +80,8 @@ def initialize_verifiers(fv_methods: List[FVMethod], args) -> Dict[str, Any]:
                     verifier = BertFactVerifier(
                         model_dir=method.model_path,
                         device=args.device,
-                        max_length=args.max_seq_length
+                        max_length=args.max_seq_length,
+                        retrieval_type=method.retrieval_type.value
                     )
                 
                 model_cache[cache_key] = verifier

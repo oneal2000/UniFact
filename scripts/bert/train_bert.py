@@ -179,12 +179,22 @@ def main():
     print(f"Validation data size: {len(val_data)}")
 
     tokenizer = AutoTokenizer.from_pretrained(args.bert_model_name)
-    train_dataset = BertFVDataset(train_data, tokenizer, args.max_seq_length)
+    train_dataset = BertFVDataset(
+        train_data,
+        tokenizer,
+        args.max_seq_length,
+        retrieval_type=args.retrieval_type
+    )
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
 
     val_loader = None
     if val_data:
-        val_dataset = BertFVDataset(val_data, tokenizer, args.max_seq_length)
+        val_dataset = BertFVDataset(
+            val_data,
+            tokenizer,
+            args.max_seq_length,
+            retrieval_type=args.retrieval_type
+        )
         val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
 
     model = BertFVModel(
