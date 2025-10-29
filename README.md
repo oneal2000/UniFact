@@ -1,6 +1,6 @@
-# AutoEval-HD-FV: A Comprehensive Evaluation Framework for Hallucination Detection and Fact Verification
+# UniFact: A Comprehensive Evaluation Framework for Hallucination Detection and Fact Verification
 
-AutoEval-HD-FV is a unified evaluation framework designed to systematically assess and benchmark hallucination detection and fact verification methods for Large Language Models (LLMs).
+UniFact is a unified evaluation framework designed to systematically assess and benchmark hallucination detection and fact verification methods for Large Language Models (LLMs).
 
 ## 🚀 Quick Start Tutorial
 
@@ -8,8 +8,8 @@ AutoEval-HD-FV is a unified evaluation framework designed to systematically asse
 
 ```bash
 # Create and activate environment
-conda create -n autoeval-hd-fv python=3.10
-conda activate autoeval-hd-fv
+conda create -n UniFact python=3.10
+conda activate UniFact
 
 # Install dependencies
 pip install -r requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
@@ -410,7 +410,7 @@ In this example, `my_new_method` (AUROC: 0.8156) outperforms the baseline `lnpp`
 
 ## 📋 Dataset Setup
 
-AutoEval-HD-FV supports five major QA datasets:
+UniFact supports five major QA datasets:
 
 ### 2WikiMultihopQA
 
