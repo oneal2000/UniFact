@@ -1,6 +1,10 @@
 # UniFact: A Comprehensive Evaluation Framework for Hallucination Detection and Fact Verification
 
-UniFact is a unified evaluation framework designed to systematically assess and benchmark hallucination detection and fact verification methods for Large Language Models (LLMs).
+Welcome to the official repository for the UniFact dataset. This project provides standardized benchmarks for evaluating and unifying two distinct paradigms: Hallucination Detection (HD) and Fact Verification (FV). The dataset includes diverse factual questions, ground-truth answers, and reference documents, specifically designed to support dynamic evaluation in which model responses are generated and verified on the fly. This setup enables a fair, head-to-head comparison of model-centric and text-centric factuality assessment methods. More details can be found in our paper: 
+
+[Towards Unification of Hallucination Detection and Fact Verification for Large Language Models](https://arxiv.org/abs/2512.02772)
+
+
 
 ## 🚀 Quick Start Tutorial
 
